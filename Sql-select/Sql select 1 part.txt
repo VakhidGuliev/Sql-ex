@@ -186,7 +186,61 @@ select distinct maker from product
   having count(model)=1
  )as p
 
+31 Для классов кораблей, калибр орудий которых не менее 16 дюймов, укажите класс и страну.
+   select class,country from classes 
+   where bore >=16
 
+
+33 Укажите корабли, потопленные в сражениях в Северной Атлантике (North Atlantic). Вывод: ship.
+   select ship from outcomes
+    where battle ='north atlantic'
+    and result = 'sunk'
+
+34 По Вашингтонскому международному договору от начала 1922 г. запрещалось строить линейные корабли водоизмещением более 35 тыс.тонн. Укажите корабли, нарушившие этот договор (учитывать только корабли c известным годом спуска на воду). Вывести названия кораблей
+  select  name from ships 
+   join classes on classes.class = ships.class
+   where launched >=1922 
+   and type = 'bb'
+   and displacement >35000
+
+35 В таблице Product найти модели, которые состоят только из цифр или только из латинских букв (A-Z, без учета регистра).
+   Вывод: номер модели, тип модели.
+    SELECT model, type
+    FROM product
+    WHERE model  not like '%[^A-Z]%'
+    OR model not  like '%[^0-9]%'
+
+36 Перечислите названия головных кораблей, имеющихся в базе данных (учесть корабли в Outcomes).
+   select name from ships where class = name
+    union
+   select ship as name from classes,outcomes where classes.class = outcomes.ship
+
+37 Найдите классы, в которые входит только один корабль из базы данных (учесть также корабли в Outcomes).
+   select class from (
+   select ships.name,ships.class from ships
+    union 
+   select classes.class,outcomes.ship from classes,outcomes
+    where classes.class = outcomes.ship) a
+    group by a.class
+    having count(a.name)=1
+
+38 Найдите страны, имевшие когда-либо классы обычных боевых кораблей ('bb') и имевшие когда-либо классы крейсеров ('bc').
+   select classes.country from classes where type ='bb'
+    intersect 
+   select classes.country from classes where type ='bc'
+
+39 Найдите корабли,  `сохранившиеся для будущих сражений`; т.е. выведенные из строя в одной битве (damaged), они участвовали в       другой, произошедшей позже.
+   with 
+   q as (
+     select o.ship,o.result ,b.name,b.date
+      from outcomes o join battles b
+      on o.battle = b.name) 
+     select distinct a. ship from q a
+      where a.ship in (
+     select distinct b.ship from q b
+      where b.date<a.date and b.result ='damaged')
+
+  
 
 
 
