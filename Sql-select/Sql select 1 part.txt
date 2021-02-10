@@ -243,7 +243,8 @@ select distinct maker from product
   
 40 Найти производителей, которые выпускают более одной модели, при этом все выпускаемые производителем модели являются продуктами одного типа.
     Вывести: maker, type
-    SELECT maker, type
+  1 option
+  SELECT maker, type
      FROM Product 
      WHERE maker IN (
        SELECT maker  
@@ -255,5 +256,9 @@ select distinct maker from product
     )  
     GROUP BY maker, type HAVING count(*)>1
 
-
+2 option
+SELECT maker, MAX(TYPE) AS TYPE
+FROM product
+GROUP BY maker
+HAVING COUNT (model)> 1 AND MAX(TYPE)=MIN(TYPE)
 
