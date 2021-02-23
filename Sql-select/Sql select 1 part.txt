@@ -152,13 +152,12 @@ select distinct maker from product
           where q.price = (select max(q.price) from q)
 25 
 Найдите производителей принтеров, которые производят ПК с наименьшим объемом RAM и с самым быстрым процессором среди всех ПК, имеющих наименьший объем RAM. Вывести: Maker
-  select maker from product where type = 'printer'
-   intersect 
-  select maker from product
+ select distinct maker from product 
   join pc on pc.model = product.model
   where ram = (select min(ram) from pc)
-  and speed = (select max(speed) from pc
+  and speed = (select max(speed) from pc 
   where ram = (select min(ram) from pc))
+  and maker in (select  maker from product where type = 'printer')
 
 
 26 Найдите среднюю цену ПК и ПК-блокнотов, выпущенных производителем A (латинская буква). Вывести: одна общая средняя цена.
