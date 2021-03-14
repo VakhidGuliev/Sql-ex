@@ -153,12 +153,14 @@ select distinct maker from product
 
 25 
 Найдите производителей принтеров, которые производят ПК с наименьшим объемом RAM и с самым быстрым процессором среди всех ПК, имеющих наименьший объем RAM. Вывести: Maker
- select distinct maker from product 
-  join pc on pc.model = product.model
-  where ram = (select min(ram) from pc)
-  and speed = (select max(speed) from pc 
-  where ram = (select min(ram) from pc))
-  and maker in (select  maker from product where type = 'printer')
+ select maker from product a
+ join pc b on a.model = b.model
+ where ram = (select min(ram) from pc)
+ and speed =( select max(speed) from pc
+ where ram = (select min(ram) from pc))
+ and maker in (select maker from product where type ='printer')
+ group by maker
+ 
 
 
 26 Найдите среднюю цену ПК и ПК-блокнотов, выпущенных производителем A (латинская буква). Вывести: одна общая средняя цена.
@@ -185,13 +187,48 @@ select distinct maker from product
   group by maker 
   having count(model)=1
  )as p
+ 
+ Таблица "Фирма вторсырья"
+ Фирма имеет несколько пунктов приема вторсырья. Каждый пункт получает деньги для их выдачи сдатчикам вторсырья. Сведения о получении денег на пунктах приема записываются в  
+ таблицу:
+ Income_o(point, date, inc)
+ Первичным ключом является (point, date). При этом в столбец date записывается только дата (без времени), т.е. прием денег (inc) на каждом пункте производится не чаще одного   раза в день. Сведения о выдаче денег сдатчикам вторсырья записываются в таблицу:
+ Outcome_o(point, date, out)
+ В этой таблице также первичный ключ (point, date) гарантирует отчетность каждого пункта о выданных деньгах (out) не чаще одного раза в день.
+ В случае, когда приход и расход денег может фиксироваться несколько раз в день, используется другая схема с таблицами, имеющими первичный ключ code:
+ Income(code, point, date, inc)
+ Outcome(code, point, date, out)
+ Здесь также значения столбца date не содержат времени.
+ 
+29 В предположении, что приход и расход денег на каждом пункте приема фиксируется не чаще одного раза в день [т.е. первичный ключ (пункт, дата)], написать запрос с выходными  данными (пункт, дата, приход, расход). Использовать таблицы Income_o и Outcome_o.
+ select t.point, t.date, SUM(t.inc), sum(t.out) from( select point, date, inc, null as out from Income_o  
+ Union 
+ select point, date, null as inc, Outcome_o.out from Outcome_o) as t group by t.point, t.date
 
-31 Для классов кораблей, калибр орудий которых не менее 16 дюймов, укажите класс и страну.
+30 В предположении, что приход и расход денег на каждом пункте приема фиксируется произвольное число раз (первичным ключом в таблицах является столбец code), требуется получить таблицу, в которой каждому пункту за каждую дату выполнения операций будет соответствовать одна строка.
+Вывод: point, date, суммарный расход пункта за день (out), суммарный приход пункта за день (inc). Отсутствующие значения считать неопределенными (NULL)
+
+select point, date, SUM(sum_out), SUM(sum_inc)
+from( select point, date, SUM(inc) as sum_inc, null as sum_out from Income Group by point, date
+Union
+select point, date, null as sum_inc, SUM(out) as sum_out from Outcome Group by point, date ) as t
+group by point, date order by point
+
+31 Одной из характеристик корабля является половина куба калибра его главных орудий (mw). С точностью до 2 десятичных знаков определите среднее значение mw для кораблей каждой страны, у которой есть корабли в базе данных.
+
+32 Select country, cast(avg((power(bore,3)/2)) as numeric(6,2)) as weight
+from (select country, classes.class, bore, name from classes left join ships on classes.class=ships.class
+union all
+select distinct country, class, bore, ship from classes t1 left join outcomes t2 on t1.class=t2.ship
+where ship=class and ship not in (select name from ships) ) a
+where name IS NOT NULL group by country
+
+33 Для классов кораблей, калибр орудий которых не менее 16 дюймов, укажите класс и страну.
    select class,country from classes 
    where bore >=16
 
 
-33 Укажите корабли, потопленные в сражениях в Северной Атлантике (North Atlantic). Вывод: ship.
+34 Укажите корабли, потопленные в сражениях в Северной Атлантике (North Atlantic). Вывод: ship.
    select ship from outcomes
     where battle ='north atlantic'
     and result = 'sunk'
@@ -241,7 +278,7 @@ select distinct maker from product
       where b.date<a.date and b.result ='damaged')
 
   
-40 Найти производителей, которые выпускают более одной модели, при этом все выпускаемые производителем модели являются продуктами одного типа.
+ Найти производителей, которые выпускают более одной модели, при этом все выпускаемые производителем модели являются продуктами одного типа.
     Вывести: maker, type
   1 option
   SELECT maker, type
@@ -261,4 +298,12 @@ SELECT maker, MAX(TYPE) AS TYPE
 FROM product
 GROUP BY maker
 HAVING COUNT (model)> 1 AND MAX(TYPE)=MIN(TYPE)
+
+Найти производителей, которые выпускают более одной модели, при этом все выпускаемые производителем модели являются продуктами одного типа.
+Вывести: maker, type 
+
+40  select maker , max(type) from product
+ group by maker
+ having count(model)>1 and max(type)=min(type)
+
 
