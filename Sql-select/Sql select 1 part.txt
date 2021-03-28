@@ -164,15 +164,14 @@ select distinct maker from product
 
 
 26 Найдите среднюю цену ПК и ПК-блокнотов, выпущенных производителем A (латинская буква). Вывести: одна общая средняя цена.
- select avg(price) 
-  from (select  price from pc
-  join product on product.model = pc.model
-  where maker = 'A'
- union all
- select price from laptop
-   join product on product.model = laptop.model
-   where maker = 'A'
- )as q
+with 
+ q as ( 
+  select pc.model, pc.price from pc
+  union  all
+  select laptop.model, laptop.price from laptop 
+) select avg(price) from q 
+  join product on product.model = q.model
+  where maker in (select maker from product where maker = 'a')
 
 
 27 Найдите средний размер диска ПК каждого из тех производителей, которые выпускают и принтеры. Вывести: maker, средний размер HD.
