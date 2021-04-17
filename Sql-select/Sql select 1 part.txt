@@ -253,12 +253,12 @@ where name IS NOT NULL group by country
 
 37 Найдите классы, в которые входит только один корабль из базы данных (учесть также корабли в Outcomes).
    select class from (
-   select ships.name,ships.class from ships
+    select c.class,name from classes c 
+    join ships s on s.class = c.class
     union 
-   select classes.class,outcomes.ship from classes,outcomes
-    where classes.class = outcomes.ship) a
-    group by a.class
-    having count(a.name)=1
+   select c.class,ship from classes c 
+    join outcomes o on o.ship = c.class
+ )  as q group by class having count (name)=1
 
 38 Найдите страны, имевшие когда-либо классы обычных боевых кораблей ('bb') и имевшие когда-либо классы крейсеров ('bc').
    select classes.country from classes where type ='bb'
