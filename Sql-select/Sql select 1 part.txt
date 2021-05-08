@@ -356,3 +356,11 @@ select ship from  outcomes
 union
 Select name from ships s 
  where name like 'R%'
+ 
+45 Найдите названия всех кораблей в базе данных, состоящие из трех и более слов (например, King George V).
+Считать, что слова в названиях разделяются единичными пробелами, и нет концевых пробелов.
+ select name from ships
+ where name like '% % %'
+ union
+select ship from outcomes
+where ship like '% % %'
