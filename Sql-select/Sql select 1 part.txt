@@ -316,5 +316,31 @@ HAVING COUNT (model)> 1 AND MAX(TYPE)=MIN(TYPE)
 40  select maker , max(type) from product
  group by maker
  having count(model)>1 and max(type)=min(type)
+ 
+Задание: 41 (Serge I: 2019-05-31)
+Для каждого производителя, у которого присутствуют модели хотя бы в одной из таблиц PC, Laptop или Printer,
+определить максимальную цену на его продукцию.
+Вывод: имя производителя, если среди цен на продукцию данного производителя присутствует NULL, то выводить для этого производителя NULL,
+иначе максимальную цену.
+ WITH q AS
+  (SELECT model,
+          price
+   FROM pc
+   UNION SELECT model,
+                price
+   FROM printer
+   UNION SELECT model,
+                price
+   FROM laptop)
+SELECT DISTINCT p.maker,
+                CASE
+                    WHEN max(CASE
+                                 WHEN q.price IS NULL THEN 1
+                                 ELSE 0
+                             END)=0 THEN max(q.price)
+                END
+FROM product p
+RIGHT JOIN q ON q.model = p.model
+GROUP BY p.maker
 
 
