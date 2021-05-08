@@ -343,4 +343,11 @@ FROM product p
 RIGHT JOIN q ON q.model = p.model
 GROUP BY p.maker
 
+42 Найдите названия кораблей, потопленных в сражениях, и название сражения, в котором они были потоплены.
+ SELECT ship,
+       battle
+FROM Outcomes
+WHERE RESULT = 'sunk'
+
+
 
