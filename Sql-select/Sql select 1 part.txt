@@ -350,4 +350,9 @@ FROM Outcomes
 WHERE RESULT = 'sunk'
 
 
-
+44 Найдите названия всех кораблей в базе данных, начинающихся с буквы R.
+select ship from  outcomes
+ where ship like 'R%'
+union
+Select name from ships s 
+ where name like 'R%'
