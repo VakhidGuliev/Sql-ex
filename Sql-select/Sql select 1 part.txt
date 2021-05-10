@@ -372,3 +372,15 @@ select distinct c.class from outcomes o
   join classes c on (o.ship=c.class or s.class=c.class)
 where result = 'sunk'
 
+49 Найдите названия кораблей с орудиями калибра 16 дюймов (учесть корабли из таблицы Outcomes).
+
+ select
+  name
+  from (
+    select name, class from ships
+    union
+    select ship, ship from outcomes
+  ) q
+  join classes c on q.class=c.class
+  where bore=16
+
