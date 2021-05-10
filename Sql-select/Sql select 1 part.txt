@@ -384,3 +384,9 @@ where result = 'sunk'
   join classes c on q.class=c.class
   where bore=16
 
+50 Найдите сражения, в которых участвовали корабли класса Kongo из таблицы Ships.
+
+select distinct battle from outcomes o
+  join ships s on o.ship=s.name
+  join classes c on c.class=s.class
+where c.class='Kongo'
