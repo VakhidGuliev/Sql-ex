@@ -278,14 +278,15 @@ select
 
 39 Найдите корабли,  `сохранившиеся для будущих сражений`; т.е. выведенные из строя в одной битве (damaged), они участвовали в       другой, произошедшей позже.
   
-Select  distinct o.ship
-From Outcomes o, Battles b
-Where o.battle=b.name and o.ship in
-( Select  o1.ship
-  From Outcomes o1, Battles b1
-  Where o1.battle=b1.name
-  and o1.result = 'damaged'
-  and b.date>b1.date)
+select distinct ship from outcomes o
+ join battles b  on o.battle = b.name
+ where result ='damaged'
+ and exists (
+ select ship from outcomes o1
+ join battles b1  on o1.battle = b1.name
+ where o.ship = o1.ship
+ and b.date < b1.date
+)
 
   
  Найти производителей, которые выпускают более одной модели, при этом все выпускаемые производителем модели являются продуктами одного типа.
