@@ -395,3 +395,11 @@ FROM   outcomes
 WHERE  ship IN (SELECT NAME
                 FROM   ships
                 WHERE  class = 'kongo') 
+                
+53 Определите среднее число орудий для классов линейных кораблей.
+   Получить результат с точностью до 2-х десятичных знаков  
+SELECT cast(Avg(numguns * 1.0) as numeric(6,2)) 
+FROM   classes
+WHERE  type = 'bb'
+
+                
