@@ -357,6 +357,18 @@ select ship from Outcomes
 select ship from outcomes
 where ship like '% % %'
 
+46 Для каждого корабля, участвовавшего в сражении при Гвадалканале (Guadalcanal), вывести название, водоизмещение и число орудий.
+SELECT ship,
+       displacement,
+       numguns
+FROM   outcomes o
+       LEFT JOIN ships s
+              ON s.NAME = o.ship
+       LEFT JOIN classes c
+              ON c.class = o.ship
+                  OR c.class = s.class
+WHERE  battle = 'Guadalcanal' 
+
 48 Найдите классы кораблей, в которых хотя бы один корабль был потоплен в сражении.
 
 select distinct c.class from outcomes o
