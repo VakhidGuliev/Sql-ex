@@ -348,7 +348,13 @@ GROUP BY p.maker
        battle
 FROM Outcomes
 WHERE RESULT = 'sunk'
-
+43 Укажите сражения, которые произошли в годы, не совпадающие ни с одним из годов спуска кораблей на воду.
+SELECT name
+FROM battles
+WHERE year(date) not in
+    (SELECT launched
+     FROM ships
+     WHERE launched IS NOT NULL)
 
 44 Найдите названия всех кораблей в базе данных, начинающихся с буквы R.
 select ship from  outcomes
