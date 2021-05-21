@@ -291,20 +291,6 @@ select distinct ship from outcomes o
   
  Найти производителей, которые выпускают более одной модели, при этом все выпускаемые производителем модели являются продуктами одного типа.
     Вывести: maker, type
-  1 option
-  SELECT maker, type
-     FROM Product 
-     WHERE maker IN (
-       SELECT maker  
-        FROM (
-                SELECT maker, type
-                FROM Product GROUP BY maker, type
-            ) x
-        GROUP BY maker HAVING count(*)=1
-    )  
-    GROUP BY maker, type HAVING count(*)>1
-
-2 option
 SELECT maker, MAX(TYPE) AS TYPE
 FROM product
 GROUP BY maker
@@ -357,11 +343,11 @@ WHERE year(date) not in
      WHERE launched IS NOT NULL)
 
 44 Найдите названия всех кораблей в базе данных, начинающихся с буквы R.
-select ship from  outcomes
- where ship like 'R%'
-union
-Select name from ships s 
- where name like 'R%'
+with q as (
+select name from ships s
+  union 
+select ship from Outcomes 
+) select name from q where name like 'r%'
  
 45 Найдите названия всех кораблей в базе данных, состоящие из трех и более слов (например, King George V).
 Считать, что слова в названиях разделяются единичными пробелами, и нет концевых пробелов.
