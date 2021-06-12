@@ -213,11 +213,22 @@ AND i.point = o.point
 30 В предположении, что приход и расход денег на каждом пункте приема фиксируется произвольное число раз (первичным ключом в таблицах является столбец code), требуется получить таблицу, в которой каждому пункту за каждую дату выполнения операций будет соответствовать одна строка.
 Вывод: point, date, суммарный расход пункта за день (out), суммарный приход пункта за день (inc). Отсутствующие значения считать неопределенными (NULL)
 
-select point, date, SUM(sum_out), SUM(sum_inc)
-from( select point, date, SUM(inc) as sum_inc, null as sum_out from Income Group by point, date
-Union
-select point, date, null as sum_inc, SUM(out) as sum_out from Outcome Group by point, date ) as t
-group by point, date order by point
+SELECT POINT,date,sum(outcome),
+                  sum(income)
+FROM
+  (SELECT i.point,
+          i.date,
+          NULL AS outcome,
+          inc AS income
+   FROM Income i
+   LEFT JOIN Outcome o ON o.code = i.code
+   UNION ALL SELECT o.point,
+                    o.date,
+                    OUT,
+                    NULL
+   FROM Outcome o
+   LEFT JOIN Income i ON o.code = i.code) AS c
+GROUP BY POINT,date
 
 31 Одной из характеристик корабля является половина куба калибра его главных орудий (mw). С точностью до 2 десятичных знаков определите среднее значение mw для кораблей каждой страны, у которой есть корабли в базе данных.
 
