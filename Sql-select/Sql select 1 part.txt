@@ -232,16 +232,22 @@ GROUP BY POINT,date
 
 31 Одной из характеристик корабля является половина куба калибра его главных орудий (mw). С точностью до 2 десятичных знаков определите среднее значение mw для кораблей каждой страны, у которой есть корабли в базе данных.
 
-32 with w as (
-  select country, name, bore from classes c join ships s on c.class=s.class
-  union
-  select country, ship, bore from classes c join outcomes o on c.class=o.ship
-)
-select
-  w.country
-  , ROUND(AVG(w.bore*w.bore*w.bore*0.5), 2) as weight
-  from w
-  group by w.country
+32 
+SELECT country,
+       cast(round(avg(power(bore, 3)/2), 2) AS numeric(6, 2)) AS weight
+FROM
+  (SELECT name,
+          country,
+          bore
+   FROM classes c
+   JOIN ships s ON s.class = c.class
+   OR s.name = c.class
+   UNION SELECT ship,
+                country,
+                bore
+   FROM classes c
+   JOIN outcomes o ON c.class = o.ship)AS s
+GROUP BY country
 
 
 33 Для классов кораблей, калибр орудий которых не менее 16 дюймов, укажите класс и страну.
